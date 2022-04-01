@@ -11,7 +11,15 @@ public class User {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Integer id;
     private String name;
-    private String password;
+    private String lastname;
+
+    public User() {
+    }
+
+    public User(String name, String lastname) {
+        this.name = name;
+        this.lastname = lastname;
+    }
 
     public Integer getId() {
         return id;
@@ -29,11 +37,11 @@ public class User {
         this.name = name;
     }
 
-    public String getPassword() {
-        return password;
+    public String getLastname() {
+        return lastname;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
     }
 }
