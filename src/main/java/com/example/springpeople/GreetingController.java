@@ -4,13 +4,13 @@ import com.example.springpeople.domain.User;
 import com.example.springpeople.repos.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Controller
 public class GreetingController {
@@ -38,9 +38,20 @@ public class GreetingController {
     @PostMapping("find")
     public String find(@RequestParam String filter, Map<String, Object> model) {
         if (filter != null && !filter.isEmpty()) {
-            List<User> findFilter = userRepository.findByLastnameOrName(filter, filter);
+            List<User> findFilter = userRepository.findByLastnameContainingOrNameContaining(filter, filter);
             model.put("users", findFilter);
             return "main";
         } else return main(model);
+    }
+    @PostMapping("update")
+    public String updateData(@RequestParam Integer id, @RequestParam String updname, @RequestParam String updlastname,
+                             Map<String, Object> model) {
+        Optional<User> updUsers = userRepository.findById(id);
+        User updUser = updUsers.get();
+        updUser.setName(updname);
+        updUser.setLastname(updlastname);
+        userRepository.save(updUser);
+        model.put("users", updUser);
+        return "main";
     }
 }

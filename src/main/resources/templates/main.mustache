@@ -13,7 +13,16 @@
         <button type="submit">Добавить</button>
     </form>
 </div>
-<h4>Список сотрудников</h4>
+<div>
+    <h3>Редактировать данные сотрудника</h3>
+    <form method="post" action="update">
+        <input type="text" name="id" placeholder="Введите id">
+        <input type="text" name="updname" placeholder="Введите имя">
+        <input type="text" name="updlastname" placeholder="Введите фамилию">
+        <button type="submit">Обновить</button>
+    </form>
+</div>
+<h3>Список сотрудников</h3>
 <div>
     <form method="post" action="find">
         <input type="text" name="filter">
