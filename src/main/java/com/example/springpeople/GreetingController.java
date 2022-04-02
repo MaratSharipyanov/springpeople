@@ -15,7 +15,7 @@ import java.util.Optional;
 @Controller
 public class GreetingController {
 
-   @Autowired
+    @Autowired
     private UserRepository userRepository;
 
     @GetMapping("/greeting")
@@ -23,18 +23,21 @@ public class GreetingController {
         model.put("name", name);
         return "greeting";
     }
+
     @GetMapping
     public String main(Map<String, Object> model) {
         Iterable<User> users = userRepository.findAll();
         model.put("users", users);
         return "main";
     }
+
     @PostMapping
     public String add(@RequestParam String name, @RequestParam String lastname, Map<String, Object> model) {
         User user = new User(name, lastname);
         userRepository.save(user);
         return main(model);
     }
+
     @PostMapping("find")
     public String find(@RequestParam String filter, Map<String, Object> model) {
         if (filter != null && !filter.isEmpty()) {
@@ -43,15 +46,24 @@ public class GreetingController {
             return "main";
         } else return main(model);
     }
+
     @PostMapping("update")
-    public String updateData(@RequestParam Integer id, @RequestParam String updname, @RequestParam String updlastname,
+    public String updateData(@RequestParam(required = false) Integer id, @RequestParam String updname, @RequestParam String updlastname,
                              Map<String, Object> model) {
-        Optional<User> updUsers = userRepository.findById(id);
-        User updUser = updUsers.get();
-        updUser.setName(updname);
-        updUser.setLastname(updlastname);
-        userRepository.save(updUser);
-        model.put("users", updUser);
-        return "main";
+        if (id == null) {
+            return main(model);
+        } else {
+            User updUser = null;
+            try {
+                updUser = userRepository.findById(id).get();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            updUser.setName(updname);
+            updUser.setLastname(updlastname);
+            userRepository.save(updUser);
+            model.put("users", updUser);
+            return "main";
+        }
     }
 }
