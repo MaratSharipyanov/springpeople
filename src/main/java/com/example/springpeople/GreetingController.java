@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -33,5 +34,13 @@ public class GreetingController {
         User user = new User(name, lastname);
         userRepository.save(user);
         return main(model);
+    }
+    @PostMapping("find")
+    public String find(@RequestParam String filter, Map<String, Object> model) {
+        if (filter != null && !filter.isEmpty()) {
+            List<User> findFilter = userRepository.findByLastnameOrName(filter, filter);
+            model.put("users", findFilter);
+            return "main";
+        } else return main(model);
     }
 }
