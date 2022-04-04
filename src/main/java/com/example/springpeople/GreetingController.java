@@ -56,13 +56,32 @@ public class GreetingController {
             User updUser = null;
             try {
                 updUser = userRepository.findById(id).get();
+                updUser.setName(updname);
+                updUser.setLastname(updlastname);
+                userRepository.save(updUser);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            updUser.setName(updname);
-            updUser.setLastname(updlastname);
-            userRepository.save(updUser);
             model.put("users", updUser);
+            return "main";
+        }
+    }
+
+    @PostMapping("delete")
+    public String deleteData(@RequestParam Integer delid, Map<String, Object> model) {
+        if (delid == null) {
+            return main(model);
+        }else {
+            User delUser = null;
+            try {
+                delUser = userRepository.findById(delid).get();
+                User delUser2 = new User(delUser.getName(), delUser.getLastname());
+                delUser2.setId(delUser.getId());
+                model.put("users", delUser2 + " - сотрудник удалён");
+                userRepository.delete(delUser);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
             return "main";
         }
     }
