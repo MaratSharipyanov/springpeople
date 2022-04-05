@@ -10,10 +10,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 
 @Controller
-public class GreetingController {
+public class PeopleController {
 
     @Autowired
     private UserRepository userRepository;
@@ -24,21 +23,23 @@ public class GreetingController {
         return "greeting";
     }
 
-    @GetMapping
+    @GetMapping("/main")
     public String main(Map<String, Object> model) {
         Iterable<User> users = userRepository.findAll();
         model.put("users", users);
         return "main";
     }
 
-    @PostMapping
-    public String add(@RequestParam String name, @RequestParam String lastname, Map<String, Object> model) {
+    @PostMapping("/main")
+    public String add(@RequestParam(defaultValue = "Введите имя") String name, @RequestParam(defaultValue = "Введите фамилию") String lastname, Map<String, Object> model) {
         User user = new User(name, lastname);
+        String message = "Сотрудник " + user.toString() + " добавлен";
         userRepository.save(user);
+        model.put("message", message);
         return main(model);
     }
 
-    @PostMapping("find")
+    @PostMapping("/find")
     public String find(@RequestParam String filter, Map<String, Object> model) {
         if (filter != null && !filter.isEmpty()) {
             List<User> findFilter = userRepository.findByLastnameContainingOrNameContaining(filter, filter);
@@ -47,8 +48,8 @@ public class GreetingController {
         } else return main(model);
     }
 
-    @PostMapping("update")
-    public String updateData(@RequestParam(required = false) Integer id, @RequestParam String updname, @RequestParam String updlastname,
+    @PostMapping("/update")
+    public String updateData(@RequestParam (required = false) Integer id, @RequestParam(required = false) String updname, @RequestParam(required = false) String updlastname,
                              Map<String, Object> model) {
         if (id == null) {
             return main(model);
@@ -56,33 +57,34 @@ public class GreetingController {
             User updUser = null;
             try {
                 updUser = userRepository.findById(id).get();
-                updUser.setName(updname);
-                updUser.setLastname(updlastname);
+                String message = updUser.toString();
+                if (updname != null && !updname.isEmpty()) {
+                    updUser.setName(updname);
+                }
+                if (updlastname != null && !updlastname.isEmpty()) {
+                    updUser.setLastname(updlastname);
+                }
+                message += " изменён на " + updUser.toString();
                 userRepository.save(updUser);
+                model.put("message", message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            model.put("users", updUser);
-            return "main";
+            return main(model);
         }
     }
 
-    @PostMapping("delete")
-    public String deleteData(@RequestParam Integer delid, Map<String, Object> model) {
-        if (delid == null) {
-            return main(model);
-        }else {
-            User delUser = null;
+    @PostMapping("/delete")
+    public String deleteData(@RequestParam(required = false) Integer delid, Map<String, Object> model) {
+        if (delid != null && delid.describeConstable().isPresent()) {
             try {
-                delUser = userRepository.findById(delid).get();
-                User delUser2 = new User(delUser.getName(), delUser.getLastname());
-                delUser2.setId(delUser.getId());
-                model.put("users", delUser2 + " - сотрудник удалён");
+                User delUser = userRepository.findById(delid).get();
+                String message = "Сотрудник " + delUser.toString() + " удалён";
                 userRepository.delete(delUser);
+                model.put("message", message);
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return "main";
-        }
+        }return main(model);
     }
 }

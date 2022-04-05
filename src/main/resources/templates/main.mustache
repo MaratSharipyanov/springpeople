@@ -7,7 +7,7 @@
 <body>
 <div>
     <h2>Добавить сотрудника</h2>
-    <form method="post" action="/">
+    <form method="post" action="main">
         <input type="text" name="name" placeholder="Введите имя">
         <input type="text" name="lastname" placeholder="Введите фамилию">
         <button type="submit">Добавить</button>
@@ -29,6 +29,18 @@
         <button type="submit">Удалить</button>
     </form>
 </div>
+
+<div>
+    <h3>
+        <i>
+            {{#message}}
+                {{message}}
+            {{/message}}
+        </i>
+    </h3>
+
+</div>
+
 <h3>Список сотрудников</h3>
 <div>
     <form method="post" action="find">

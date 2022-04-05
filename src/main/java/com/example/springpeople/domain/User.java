@@ -44,4 +44,9 @@ public class User {
     public void setLastname(String lastname) {
         this.lastname = lastname;
     }
+
+    @Override
+    public String toString() {
+        return name + " " + lastname;
+    }
 }
