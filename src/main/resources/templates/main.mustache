@@ -6,10 +6,17 @@
 </head>
 <body>
 <div>
+    <form action="/logout" method="post">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
+        <input type="submit" value="Sign Out"/>
+    </form>
+</div>
+<div>
     <h2>Добавить сотрудника</h2>
     <form method="post" action="main">
         <input type="text" name="name" placeholder="Введите имя">
         <input type="text" name="lastname" placeholder="Введите фамилию">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
         <button type="submit">Добавить</button>
     </form>
 </div>
@@ -19,6 +26,7 @@
         <input type="text" name="id" placeholder="Введите id">
         <input type="text" name="updname" placeholder="Введите имя">
         <input type="text" name="updlastname" placeholder="Введите фамилию">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
         <button type="submit">Обновить</button>
     </form>
 </div>
@@ -26,6 +34,7 @@
     <h3>Удалить сотрудника</h3>
     <form method="post" action="delete">
         <input type="text" name="delid" placeholder="Введите id">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
         <button type="submit">Удалить</button>
     </form>
 </div>
@@ -45,6 +54,7 @@
 <div>
     <form method="post" action="find">
         <input type="text" name="filter">
+        <input type="hidden" name="_csrf" value="{{_csrf.token}}"/>
         <button type="submit">Найти</button>
     </form>
 </div>

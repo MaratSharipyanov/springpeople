@@ -1,4 +1,4 @@
-package com.example.springpeople;
+package com.example.springpeople.controller;
 
 import com.example.springpeople.domain.Person;
 import com.example.springpeople.repos.PersonRepository;
