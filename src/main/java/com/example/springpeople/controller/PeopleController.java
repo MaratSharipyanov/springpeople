@@ -23,10 +23,17 @@ public class PeopleController {
     }
 
     @GetMapping("/main")
-    public String main(Map<String, Object> model) {
-        Iterable<Person> users = personRepository.findAll();
-        model.put("users", users);
-        return "main";
+    public String main(@RequestParam(required = false) String filter, Map<String, Object> model) {
+        if (filter != null && !filter.isEmpty()) {
+            List<Person> findFilterUsers = personRepository.findByLastnameContainingOrNameContaining(filter, filter);
+            model.put("users", findFilterUsers);
+            model.put("filter", filter);
+            return "main";
+        } else {
+            Iterable<Person> users = personRepository.findAll();
+            model.put("users", users);
+            return "main";
+        }
     }
 
     @PostMapping("/main")
@@ -35,23 +42,18 @@ public class PeopleController {
         String message = "Сотрудник " + person.toString() + " добавлен";
         personRepository.save(person);
         model.put("message", message);
-        return main(model);
-    }
-
-    @PostMapping("/find")
-    public String find(@RequestParam String filter, Map<String, Object> model) {
-        if (filter != null && !filter.isEmpty()) {
-            List<Person> findFilter = personRepository.findByLastnameContainingOrNameContaining(filter, filter);
-            model.put("users", findFilter);
-            return "main";
-        } else return main(model);
+        Iterable<Person> users = personRepository.findAll();
+        model.put("users", users);
+        return "main";
     }
 
     @PostMapping("/update")
     public String updateData(@RequestParam (required = false) Integer id, @RequestParam(required = false) String updname, @RequestParam(required = false) String updlastname,
                              Map<String, Object> model) {
         if (id == null) {
-            return main(model);
+            Iterable<Person> users = personRepository.findAll();
+            model.put("users", users);
+            return "main";
         } else {
             Person updPerson = null;
             try {
@@ -69,13 +71,13 @@ public class PeopleController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return main(model);
+            return mainPage(model);
         }
     }
 
     @PostMapping("/delete")
     public String deleteData(@RequestParam(required = false) Integer delid, Map<String, Object> model) {
-        if (delid != null && delid.describeConstable().isPresent()) {
+        if (delid != null) {
             try {
                 Person delPerson = personRepository.findById(delid).get();
                 String message = "Сотрудник " + delPerson.toString() + " удалён";
@@ -84,6 +86,13 @@ public class PeopleController {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }return main(model);
+        }
+        return mainPage(model);
+    }
+
+    private String mainPage(Map<String, Object> model) {
+        Iterable<Person> persons = personRepository.findAll();
+        model.put("persons", persons);
+        return "main";
     }
 }
