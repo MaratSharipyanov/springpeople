@@ -4,10 +4,12 @@ import com.example.springpeople.domain.Person;
 import com.example.springpeople.repos.PersonRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 
@@ -25,14 +27,12 @@ public class PeopleController {
     @GetMapping("/main")
     public String main(@RequestParam(required = false) String filter, Map<String, Object> model) {
         if (filter != null && !filter.isEmpty()) {
-            List<Person> findFilterUsers = personRepository.findByLastnameContainingOrNameContaining(filter, filter);
-            model.put("users", findFilterUsers);
+            List<Person> findFilterPersons = personRepository.findByLastnameContainingOrNameContaining(filter, filter);
+            model.put("persons", findFilterPersons);
             model.put("filter", filter);
             return "main";
         } else {
-            Iterable<Person> users = personRepository.findAll();
-            model.put("users", users);
-            return "main";
+            return mainPage(model);
         }
     }
 
@@ -42,18 +42,14 @@ public class PeopleController {
         String message = "Сотрудник " + person.toString() + " добавлен";
         personRepository.save(person);
         model.put("message", message);
-        Iterable<Person> users = personRepository.findAll();
-        model.put("users", users);
-        return "main";
+        return mainPage(model);
     }
 
     @PostMapping("/update")
     public String updateData(@RequestParam (required = false) Integer id, @RequestParam(required = false) String updname, @RequestParam(required = false) String updlastname,
                              Map<String, Object> model) {
         if (id == null) {
-            Iterable<Person> users = personRepository.findAll();
-            model.put("users", users);
-            return "main";
+            return mainPage(model);
         } else {
             Person updPerson = null;
             try {
@@ -76,17 +72,16 @@ public class PeopleController {
     }
 
     @PostMapping("/delete")
-    public String deleteData(@RequestParam(required = false) Integer delid, Map<String, Object> model) {
+    public String deleteData(@RequestParam Integer delid, Map<String, Object> model) throws IOException {
+        String message = "";
         if (delid != null) {
-            try {
-                Person delPerson = personRepository.findById(delid).get();
-                String message = "Сотрудник " + delPerson.toString() + " удалён";
-                personRepository.delete(delPerson);
-                model.put("message", message);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            Person delPerson = personRepository.findById(delid).get();
+            message = "Сотрудник " + delPerson.toString() + " удалён";
+            personRepository.delete(delPerson);            ;
+        } else {
+            message = exeptionCatcher();
         }
+        model.put("message", message);
         return mainPage(model);
     }
 
@@ -94,5 +89,9 @@ public class PeopleController {
         Iterable<Person> persons = personRepository.findAll();
         model.put("persons", persons);
         return "main";
+    }
+    @ExceptionHandler(IOException.class)
+    public String exeptionCatcher() {
+        return "Некорректный ввод";
     }
 }
