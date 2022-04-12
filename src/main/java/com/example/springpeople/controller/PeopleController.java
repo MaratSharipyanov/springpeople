@@ -48,38 +48,34 @@ public class PeopleController {
     @PostMapping("/update")
     public String updateData(@RequestParam (required = false) Integer id, @RequestParam(required = false) String updname, @RequestParam(required = false) String updlastname,
                              Map<String, Object> model) {
-        if (id == null) {
-            return mainPage(model);
-        } else {
-            Person updPerson = null;
-            try {
-                updPerson = personRepository.findById(id).get();
-                String message = updPerson.toString();
-                if (updname != null && !updname.isEmpty()) {
-                    updPerson.setName(updname);
-                }
-                if (updlastname != null && !updlastname.isEmpty()) {
-                    updPerson.setLastname(updlastname);
-                }
-                message += " изменён на " + updPerson.toString();
-                personRepository.save(updPerson);
-                model.put("message", message);
-            } catch (Exception e) {
-                e.printStackTrace();
+        String message = null;
+        if (id != null && personRepository.findById(id).isPresent()) {
+            Person updPerson = personRepository.findById(id).get();
+            message = updPerson.toString();
+            if (updname != null && !updname.isEmpty()) {
+                updPerson.setName(updname);
             }
-            return mainPage(model);
+            if (updlastname != null && !updlastname.isEmpty()) {
+                updPerson.setLastname(updlastname);
+            }
+            message += " изменён на " + updPerson.toString();
+            personRepository.save(updPerson);
+        }else {
+            message = "Некорректный ввод";
         }
+        model.put("message", message);
+        return mainPage(model);
     }
 
     @PostMapping("/delete")
-    public String deleteData(@RequestParam Integer delid, Map<String, Object> model) throws IOException {
-        String message = "";
-        if (delid != null) {
+    public String deleteData(@RequestParam(required = false) Integer delid, Map<String, Object> model) {
+        String message = null;
+        if (delid != null && personRepository.findById(delid).isPresent()) {
             Person delPerson = personRepository.findById(delid).get();
             message = "Сотрудник " + delPerson.toString() + " удалён";
             personRepository.delete(delPerson);            ;
         } else {
-            message = exeptionCatcher();
+            message = "Некорректный ввод";
         }
         model.put("message", message);
         return mainPage(model);
@@ -89,9 +85,5 @@ public class PeopleController {
         Iterable<Person> persons = personRepository.findAll();
         model.put("persons", persons);
         return "main";
-    }
-    @ExceptionHandler(IOException.class)
-    public String exeptionCatcher() {
-        return "Некорректный ввод";
     }
 }
